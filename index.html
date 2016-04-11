@@ -1,0 +1,480 @@
+<!DOCTYPE>
+
+<html>
+
+    <head>
+        <title>ASPS community</title>
+
+        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+
+        <script src="jquery-2.2.1.min.js"></script>
+        <script src="cytoscape.min.js"></script>
+        <script src="jquery.popupoverlay.js"></script>
+        <script src="elements.js"></script>
+
+        <!-- for testing with local version of cytoscape.js -->
+        <!--<script src="../cytoscape.js/build/cytoscape.js"></script>-->
+
+ 
+        <style>
+            body {
+                font-family: helvetica;
+                font-size: 14px;
+            }
+            
+            .commentary {
+                font-size: 15px;
+                color: #f05a28;
+                opacity: 0.9;
+                padding: 15 20 0 20;
+                margin: 20 0 0 50;
+                width: 280px;
+                height: 330px;
+                position: relative;
+                float: left;
+                z-index: 1000;
+                background-color: #c8ebf5;
+                -webkit-border-radius: 3px;
+                border-radius: 3px;
+            }
+
+            .closing {
+                display: none;
+                font-size: 15px;
+                color: #f05a28;
+                opacity: 0.9;
+                padding: 15 20 0 20;
+                margin: 20 0 0 50;
+                width: 280px;
+                height: 330px;
+                position: relative;
+                float: left;
+                z-index: 1000;
+                background-color: #c8ebf5;
+                -webkit-border-radius: 3px;
+                border-radius: 3px;
+            }
+
+            button {
+              position: relative;
+              float: right;
+              margin: 0;
+              font-size: 1.0rem;
+              margin-top: 20px;
+              padding: 1.0rem 1.0rem;
+              display: block;
+              background-color: #f9561a;
+              border: 1px solid transparent;
+              color: #ffffff;
+              opacity: 0.9;
+              font-weight: 300;
+              -webkit-border-radius: 3px;
+              border-radius: 3px;
+              -webkit-transition: all 0.3s ease-in-out;
+              -moz-transition: all 0.3s ease-in-out;
+              transition: all 0.3s ease-in-out;
+            }
+
+            button:hover {
+              background-color: #ffffff;
+              color: #f9561a;
+              border-color: #f9561a;
+            }
+
+            .page_text {
+                padding-left: 50px;
+                width: 300px;
+                height: 390px;
+            }
+
+            #cy {
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                left: 200;
+                top: 0;
+                z-index: 999;
+            }
+
+        </style>
+
+        <script>
+            $(function(){
+                var cy = cytoscape({
+                    container: document.getElementById('cy'),
+
+                    layout: {
+                        name: 'preset',
+                        padding: 10
+                    },
+
+                    style: [
+                        {
+                            selector: 'node',
+                            css: {
+                                'background-color': '#f15a24', 
+                                'height': 'data(height)',
+                                'width': 'data(width)'
+                            }
+                        },
+                        {
+                            selector: ':selected',
+                            css: {
+                                'background-opacity': 0.222,
+                                'label': 'data(id)',
+                                'font-size': '32px'
+                          }
+                        },
+
+                        {
+                            selector: ':parent',
+                            css: {
+                                'background-opacity': 0.222,
+                                'label': 'data(id)',
+                                'font-size': '32px'
+                          }
+                        },
+                        {
+                            selector: 'edge',
+                            css: {
+                                'width': 1,
+                                'line-color': '#f15a24',
+                                'background-color': '#f15a24',
+                                'target-arrow-shape': 'triangle',
+                                'target-arrow-color': '#f15a24',
+                                'opacity': '0.333'
+                            }
+                        },
+                        {
+                            selector: '.hidden',
+                            css: {
+                                'display': 'none'                          
+                            }
+                        },
+                        {
+                            selector: '.faded',
+                            css: {
+                            'background-color': '#ccc',
+                            'background-opacity': '0.5'                          
+                            }
+                        },
+                        {
+                            selector: '.end',
+                            css: {
+                            'curve-style': 'haystack'
+                            }
+                        },
+                        {
+                            selector: ':selected',
+                            css: {
+                            'border-width': 3,
+                            'border-color': '#333',
+                            }
+                        },
+                        {
+                            selector: '.highlighted',
+                            css: {
+                                'width': 1,
+                                'line-color': '#61bffc',
+                                'background-color': '#61bffc',
+                                'target-arrow-color': '#61bffc',
+                                'opacity': '0.9',
+                                'curve-style': 'haystack'                                
+                            }
+                        },
+                    ]
+
+                });
+
+               cy.load( elements );
+               cy.edges().addClass('hidden');
+
+
+                //Page 1 - ASPS Newsletter (send message to everyone)
+
+                    $('#btn-1').click(function(){
+                        $( ".commentary" ).hide();
+
+                        cy.edges("edge[class = 'all']").removeClass('hidden').animate({
+                            style: {
+                            'opacity': '0.5'
+                            }
+                        });
+                    });
+
+                    $('#one_popup').popup({
+                      background: false,
+                      horizontal: 'left',
+                      onclose: function(){
+                      cy.$("edge[class = 'all']").addClass('hidden');
+                      cy.nodes().difference('node[class = "teacher"]').addClass('faded');
+                      $('#three_popup').popup('show');
+                      cy.edges('edge[class = "class_out"]').removeClass('hidden').animate({
+                        style: {
+                                'background-color': '#f15a24',
+                                'line-color': '#f15a24',
+                                'width': 1,
+                                'opacity': '0.5',
+                                'target-arrow-color': '#f15a24'
+                            }
+                        }, {
+                        duration: 2500,
+                        });
+                      cy.edges('edge[class = "class_back"]').removeClass('hidden').animate({
+                        style: {
+                                'background-color': '#61bffc',
+                                'line-color': '#61bffc',
+                                'width': 3,
+                                'opacity': '0.666',
+                                'target-arrow-color': '#61bffc'
+                            }
+                        }, {
+                        duration: 2500,
+                        });
+                      }
+                    });
+
+                //Page 2 - send message re: classes                    
+
+                    $('#three_popup').popup({
+                     background: false,
+                      horizontal: 'left',
+                      onclose: function(){
+                      cy.$("edge[class = 'all']").addClass('hidden');
+                      cy.nodes().difference('node[class = "teacher"]').addClass('faded');
+                      $('#four_popup').popup('show');
+                      cy.edges('edge[class = "class_out"]').removeClass('hidden').animate({
+                        style: {
+                                'background-color': '#f15a24',
+                                'line-color': '#f15a24',
+                                'width': 1,
+                                'opacity': '0.5',
+                                'target-arrow-color': '#f15a24'
+                            }
+                        }, {
+                        duration: 1000,
+                        });
+                      cy.edges('edge[class = "class_back"]').removeClass('hidden').animate({
+                        style: {
+                                'background-color': '#61bffc',
+                                'line-color': '#61bffc',
+                                'width': 3,
+                                'opacity': '0.666',
+                                'target-arrow-color': '#61bffc'
+                            }
+                        }, {
+                        duration: 1000,
+                        });                      
+                      }
+                    });
+
+                //Page 3 & 4 - send message re: PA volunteers
+
+                    $('#four_popup').popup({
+                      opacity: 0.85,
+                      onclose: function(){
+                      cy.$("edge[class = 'class_out']").addClass('hidden');
+                      cy.$("edge[class = 'class_back']").addClass('hidden');
+                      cy.nodes('node[class = "PA"]').removeClass('faded');
+                      $('#five_popup').popup('show');
+                      cy.edges('edge[class = "Yes"]').removeClass('hidden').animate({
+                        style: {
+                                'background-color': '#61bffc',
+                                'line-color': '#61bffc',
+                                'width': 3,
+                                'opacity': '0.666',
+                                'target-arrow-shape': 'triangle',
+                                'target-arrow-color': '#61bffc'
+                            }
+                        }, {
+                        duration: 1500,
+                        });
+
+                      cy.edges('edge[class = "No, but"]').removeClass('hidden').animate({
+                        style: {
+                                'background-color': '#61bffc',
+                                'line-color': '#61bffc',
+                                'width': 3,
+                                'opacity': '0.666',
+                                'target-arrow-shape': 'triangle',
+                                'target-arrow-color': '#61bffc'
+                            }
+                        }, {
+                        duration: 1500,
+                        });
+                      cy.nodes().difference('node[class = "PA"]').addClass('faded');
+                      }
+                    });
+
+                    $('#five_popup').popup({
+                     background: false,
+                      horizontal: 'left',
+                      onclose: function(){
+                      $('#six_popup').popup('show');                       
+                      }
+                    });
+
+
+                //Page 5 & 6 - send message re: SAKG
+
+                    $('#six_popup').popup({
+                      opacity: 0.85,
+                      onclose: function(){
+                      cy.$("edge[class = 'Yes']").addClass('hidden');
+                      cy.$("edge[class = 'No, but']").addClass('hidden');
+                      $('#seven_popup').popup('show');
+                      cy.nodes('node[class = "SAKG"]').removeClass('faded');
+                      cy.nodes().difference('node[class = "SAKG"]').addClass('faded');
+
+                      cy.edges('edge[class = "SAKG_out"]').removeClass('hidden')
+                      .animate({
+                        style: {
+                                'background-color': '#f15a24',
+                                'line-color': '#f15a24',
+                                'width': 1,
+                                'opacity': '0.5',
+                                'target-arrow-color': '#f15a24'
+                            },
+                        });
+
+                      cy.edges('edge[class = "SAKG_back"]')
+                      .delay(2000)
+                      .removeClass('hidden')
+                      .animate({
+                        style: {
+                                'background-color': '#61bffc',
+                                'line-color': '#61bffc',
+                                'width': 3,
+                                'opacity': '0.666',
+                                'target-arrow-color': '#61bffc'
+                            }
+                        }, {
+                        duration: 2000,
+                        });
+
+                      cy.edges('edge[class = "SAKG_confirm"]')
+                      .delay(4000)
+                      .removeClass('hidden')
+                      .animate({
+                        style: {
+                                'background-color': '#00ff00',
+                                'line-color': '#00ff00',
+                                'width': 3,
+                                'opacity': '0.666',
+                                'target-arrow-color': '#00ff00'
+                            }
+                        }, {
+                        duration: 2000,
+                        });
+
+                      }
+                    });
+ 
+
+                    $('#seven_popup').popup({
+                     background: false,
+                      horizontal: 'left',
+                      onclose: function(){
+                      $('#eight_popup').popup('show');                       
+                      }
+                    });
+
+                //Page 7 & 8 - summary all messages
+
+                    $('#eight_popup').popup({
+                      opacity: 0.85,
+                      onclose: function(){
+                      $('#nine_popup').popup('show');
+                      cy.load(elements);
+                      }
+                    });
+
+                    $('#nine_popup').popup({
+                     background: false,
+                      horizontal: 'left',
+                      onclose: function(){
+                      $('.closing').show();
+                      }                     
+                    });
+
+                    cy.on('tap', 'node', function(e) {
+                        var node = e.cyTarget;
+                        node.addClass('label');
+                        var directEdges = node.connectedEdges();
+                        directEdges.flashClass('highlighted',3000);
+                    });
+
+
+            }); // on dom ready
+                
+
+        </script>
+    </head>
+
+    <body>
+        <image src="geddup_logo.png" class="logo">
+
+            <br>
+         <div class="commentary">
+            <h1>A week in the life of Auburn South Primary School</h1>
+
+            <p>
+                Geddup is changing the way communities share data and information. The following visualisation looks at a recent week at one of our pioneering communities, Auburn South Primary School.
+            <br>
+            </p>
+
+            <button id="btn-1" class="one_popup_open">Start</button>
+        </div>
+
+        <div id="one_popup" class="page_text">
+        <image src="page_one.png">
+        <button class="one_popup_close">Next</button>
+        </div>
+
+        <div id="three_popup" class="page_text">
+        <image src="page_two.png">
+        <button class="three_popup_close">Next</button>
+        </div>
+
+        <div id="four_popup">
+        <image src="page_three.png">
+        <button class="four_popup_close">Next</button>
+        </div>
+
+        <div id="five_popup" class="page_text">
+        <image src="page_four.png">
+        <button class="five_popup_close">Next</button>
+        </div>
+
+        <div id="six_popup">
+        <image src="page_five.png">
+        <button class="six_popup_close">Next</button>
+        </div>
+
+        <div id="seven_popup" class="page_text">
+        <image src="page_six.png">
+        <button class="seven_popup_close">Next</button>
+        </div>
+
+        <div id="eight_popup">
+        <image src="page_seven.png">
+        <button class="eight_popup_close">Next</button>
+        </div>
+
+        <div id="nine_popup" class="page_text">
+        <image src="page_eight.png">
+        <button class="nine_popup_close">End</button>
+        </div>
+
+        <div class="closing">
+            <h1>A week in the life of Auburn South Primary</h1>
+            <br>
+            <h3>Messages from week<br>11Feb16 to 17Feb16</h3>
+        </div>
+
+        <div id="cy"></div>
+
+
+    </body>
+
+</html>
